@@ -72,6 +72,7 @@ genfscon sysfs /devices/platform/soc/soc:indicator_led/leds/charging            
 # LiveDisplay
 genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/dsi_display_acl     u:object_r:sysfs_livedisplay_tuneable:s0
 genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/dsi_display_cabc    u:object_r:sysfs_livedisplay_tuneable:s0
+genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/dsi_display_dc      u:object_r:sysfs_livedisplay_tuneable:s0
 genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/dsi_display_hbm     u:object_r:sysfs_livedisplay_tuneable:s0
 
 # Motorola
@@ -201,4 +202,5 @@ genfscon sysfs /devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qco
 genfscon sysfs /devices/virtual/input/input2/wakeup                                                                                                                             u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/virtual/input/input5/wakeup                                                                                                                             u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/virtual/input/input7/wakeup                                                                                                                             u:object_r:sysfs_wakeup:s0
+genfscon sysfs /devices/virtual/input/input8/wakeup                                                                                                                             u:object_r:sysfs_wakeup:s0
 genfscon sysfs /devices/virtual/misc/focaltech_fp/wakeup                                                                                                                        u:object_r:sysfs_wakeup:s0
