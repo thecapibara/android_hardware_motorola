@@ -12,6 +12,7 @@ import android.os.SystemClock
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.provider.Settings
 import android.util.Log
 
 class Utils(private val context: Context) {
@@ -19,16 +20,6 @@ class Utils(private val context: Context) {
     private val powerManager = context.getSystemService(PowerManager::class.java)!!
     private val vibrator = context.getSystemService(Vibrator::class.java)!!
     private val packageManager = context.packageManager
-
-    private val packageContext = context.createPackageContext(
-        KeyHandler::class.java.getPackage()!!.name, 0
-    )
-
-    private val sharedPreferences
-        get() = packageContext.getSharedPreferences(
-            packageContext.packageName + "_preferences",
-            Context.MODE_PRIVATE or Context.MODE_MULTI_PROCESS
-        )
 
     fun turnScreenOn() {
         powerManager.wakeUp(
@@ -38,37 +29,36 @@ class Utils(private val context: Context) {
         )
     }
 
-    fun vibrateIfNeeded(effect: VibrationEffect) {
-        val vibrateEnabled = sharedPreferences.getBoolean(KEY_VIBRATE, true)
-        if (vibrateEnabled) {
-            vibrator.vibrate(
-                effect,
-                HARDWARE_FEEDBACK_VIBRATION_ATTRIBUTES
-            )
-        }
+    fun turnScreenOff() {
+        powerManager.goToSleep(SystemClock.uptimeMillis())
     }
 
-    fun launchApp() {
-        val packageName = sharedPreferences.getString(KEY_LAUNCH_APP, null)
-        if (!packageName.isNullOrEmpty()) {
-            val intent = packageManager.getLaunchIntentForPackage(packageName)
-            intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent?.let {
-                try {
-                    packageContext.startActivity(it)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to launch $packageName", e)
-                }
-            } ?: Log.w(TAG, "No launch intent found for $packageName")
-        }
+    fun vibrateIfNeeded(effect: VibrationEffect) {
+        vibrator.vibrate(
+            effect,
+            HARDWARE_FEEDBACK_VIBRATION_ATTRIBUTES
+        )
+    }
+
+    fun launchApp(packageName: String) {
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent?.let {
+            try {
+                context.startActivity(it)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to launch $packageName", e)
+            }
+        } ?: Log.w(TAG, "No launch intent found for $packageName")
+    }
+
+    fun isSetupComplete(): Boolean {
+        return Settings.Global.getInt(context.contentResolver, Settings.Global.DEVICE_PROVISIONED, 0) != 0 &&
+                Settings.Secure.getInt(context.contentResolver, Settings.Secure.USER_SETUP_COMPLETE, 0) != 0
     }
 
     companion object {
         private const val TAG = "Utils"
-
-        // Preference keys
-        const val KEY_VIBRATE = "vibrate"
-        const val KEY_LAUNCH_APP = "launch_app"
 
         // Vibration attributes
         val HARDWARE_FEEDBACK_VIBRATION_ATTRIBUTES =
